@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 from secrets import token_bytes
-from ecdsa import SigningKey, SECP256k1
 from hashlib import blake2b
 import hashlib
 import bitcoinlib
