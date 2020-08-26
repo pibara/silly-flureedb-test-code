@@ -70,3 +70,34 @@ signer = DbSigner(privkey, "mydbs/test")
 command = signer.sign_transaction(data)
 
 ```
+### script result
+
+```bash
+#!/bin/sh
+echo "##########################################"
+echo "########     TESTING JS -> JS     ########"
+./generate-signature.js |./validate-signature.js
+echo "######## TESTING PYTHON -> PYTHON ########"
+./generate-signature.py |./validate-signature.py
+echo "########   TESTING JS -> PYTHON   ########"
+./generate-signature.js |./validate-signature.py
+echo "########   TESTING PYTHON -> JS   ########"
+./generate-signature.py |./validate-signature.js
+echo "################ DONE ####################"
+```
+
+```
+##########################################
+########     TESTING JS -> JS     ########
+OK
+######## TESTING PYTHON -> PYTHON ########
+DEBUG: signature length 64
+OK
+########   TESTING JS -> PYTHON   ########
+DEBUG: signature length 48
+ERROR from bitcoinlib: Signature length must be 64 bytes or 128 character hexstring
+FAIL
+########   TESTING PYTHON -> JS   ########
+FAIL: Unknown signature header
+################ DONE ####################
+```
