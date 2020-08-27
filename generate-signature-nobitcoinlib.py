@@ -1,19 +1,19 @@
 #!/usr/bin/python3
-import bitcoinlib
 import hashlib
 import json
 import random
 import time
 import asn1
 import base58
+import ecdsa
 
 class DbSigner:
-    def __init__(self, privkey, db, validity=120, fuel=1000):
+    def __init__(self, privkey, address, db, validity=120, fuel=1000):
         if len(privkey) != 64:
             privkey = base58.b58decode(privkey).hex()
-        self.private_key = bitcoinlib.keys.Key(privkey)
-        self.public_key = self.private_key.public()
-        self.auth_id = self.private_key.address()
+        self.private_key = ecdsa.SigningKey.from_string(bytes.fromhex(privkey), curve=ecdsa.SECP256k1)
+        self.public_key = self.private_key.get_verifying_key()
+        self.auth_id = address
         self.db = db
         self.validity = validity
         self.fuel = fuel
@@ -22,10 +22,10 @@ class DbSigner:
         h = hashlib.sha256()
         h.update(datastring.encode())
         digest = h.digest()
-        signature = bitcoinlib.keys.sign(digest, self.private_key)
+        signature = self.private_key.sign_digest(digest)
         encoder = asn1.Encoder()
         encoder.start()
-        encoder.write(signature.bytes(), asn1.Numbers.OctetString)
+        encoder.write(signature, asn1.Numbers.OctetString)
         encoded_bytes = encoder.output()
         command = dict()
         command["cmd"] = datastring
@@ -54,5 +54,6 @@ def free_test(signer):
     print(command);
 
 privkey = "bf8a7281f43918a18a3feab41d17e84f93b064c441106cf248307d87f8a60453"
-signer = DbSigner(privkey, "dla/test")
+address = "1AxKSFQ387AiQUX6CuF3JiBPGwYK5XzA1A"
+signer = DbSigner(privkey, address, "dla/test")
 free_test(signer)
