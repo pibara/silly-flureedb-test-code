@@ -4,7 +4,6 @@ import json
 import random
 import time
 import base58
-import eth_keys
 from ellipticcurve import privateKey, ecdsa
 
 class DbSigner:
